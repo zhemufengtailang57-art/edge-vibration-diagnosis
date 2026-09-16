@@ -1,0 +1,27 @@
+{
+  "dashboard": {
+    "title": "振动监测面板",
+    "refresh": "1s",
+    "panels": [
+      {
+        "title": "实时曲线",
+        "type": "timeseries",
+        "gridPos": { "x": 0, "y": 0, "w": 24, "h": 14 },
+        "targets": [
+          {
+            "refId": "RMS",
+            "datasource": { "type": "yesoreyeram-infinity-datasource" },
+            "url": "http://localhost:8080/api/history",
+            "root_selector": "",
+            "columns": [
+              { "selector": "rms", "text": "rms", "type": "number" },
+              { "selector": "freq", "text": "freq", "type": "number" }
+            ],
+            "format": "timeseries"
+          }
+        ]
+      }
+    ],
+    "time": { "from": "now-5m", "to": "now" }
+  }
+}

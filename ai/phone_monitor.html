@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>振动监测</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#0d1117; color:#c9d1d9; font-family:system-ui,sans-serif; padding:12px; }
+h1 { text-align:center; font-size:18px; color:#8b949e; margin-bottom:12px; }
+.cards { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; }
+.card { background:#161b22; border-radius:8px; padding:12px 8px; text-align:center; }
+.card .label { font-size:11px; color:#8b949e; }
+.card .val { font-size:28px; font-weight:bold; margin:4px 0; }
+.full { grid-column:1/-1; }
+.status-0 { color:#3fb950; }
+.status-1 { background:#d29922; color:#fff; border-radius:6px; }
+.status-2 { background:#f85149; color:#fff; border-radius:6px; }
+.footer { text-align:center; font-size:10px; color:#484f58; margin-top:8px; }
+</style>
+</head>
+<body>
+<h1>振动监测</h1>
+<div class="cards">
+  <div class="card"><div class="label">振动 RMS</div><div class="val" id="rms" style="color:#3fb950">--</div><div class="label">mG</div></div>
+  <div class="card"><div class="label">频率</div><div class="val" id="freq" style="color:#79c0ff">--</div><div class="label">Hz</div></div>
+  <div class="card"><div class="label">温度</div><div class="val" id="temp" style="color:#d2a8ff">--</div><div class="label">°C</div></div>
+  <div class="card"><div class="label">运行时长</div><div class="val" id="up" style="font-size:18px;color:#8b949e">--</div></div>
+  <div class="card full"><div class="label">系统状态</div><div class="val" id="st" style="font-size:20px">--</div></div>
+</div>
+<div class="footer" id="footer">连接中...</div>
+<script>
+const BRIDGE = location.protocol + '//' + location.host + '/api/latest';
+async function poll() {
+  try {
+    const r = await fetch(BRIDGE);
+    const d = await r.json();
+    const arr = Array.isArray(d) ? d[0] : d;
+    document.getElementById('rms').textContent = arr.rms;
+    document.getElementById('freq').textContent = arr.freq;
+    document.getElementById('temp').textContent = (arr.temp/10).toFixed(1);
+    const h = Math.floor(arr.up/3600), m = Math.floor((arr.up%3600)/60), s = arr.up%60;
+    document.getElementById('up').textContent = h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+    const st = arr.st, txt = ['正常','预警','故障'][st]||'--';
+    const el = document.getElementById('st');
+    el.textContent = txt;
+    el.className = 'val status-'+st;
+    document.getElementById('rms').style.color = arr.rms>50 ? '#f85149' : '#3fb950';
+    document.getElementById('footer').textContent = '已连接 · '+new Date().toLocaleTimeString();
+  } catch(e) {
+    document.getElementById('footer').textContent = '等待数据...';
+  }
+}
+setInterval(poll, 1000);
+poll();
+</script>
+</body>
+</html>

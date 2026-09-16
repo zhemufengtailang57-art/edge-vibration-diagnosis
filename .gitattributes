@@ -1,0 +1,14 @@
+# 统一换行符处理：仓库内存 LF，各平台检出时自动转换
+* text=auto
+
+# Keil / CubeMX 工程文件保持原样，避免工具解析异常
+*.uvprojx  text
+*.uvoptx   text
+*.ioc      text
+
+# 二进制资源不做换行符转换
+*.png      binary
+*.jpg      binary
+*.pdf      binary
+*.docx     binary
+*.npz      binary

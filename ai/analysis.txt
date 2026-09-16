@@ -1,0 +1,4 @@
+﻿rows: 200
+RMS  : min=7 max=599 mean=501
+Freq : min=0 max=23 mode=[(15, 149), (23, 50), (0, 1)]
+Amp  : min=0 max=191 mean=143
