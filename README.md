@@ -5,10 +5,10 @@
 针对电机、风机等旋转设备的不平衡、基座松动等常见故障，传统云端诊断方案存在网络依赖与数据外泄风险，无法满足军工及高端制造客户"数据不出厂区"的要求。本项目把 FFT 特征提取、神经网络推理、故障存储全部放在 MCU 端完成，仅上报诊断结论，原始振动数据不出设备。
 
 <p align="center">
-  <img src="hardware/pcb/VibrationMonitor_F407_PCB_Layout.png" alt="VibrationMonitor_F407 PCB Layout" width="860">
+  <img src="hardware/pcb/VibrationMonitor_F407_3D.png" alt="VibrationMonitor_F407 主控板 3D 渲染" width="780">
 </p>
 
-<p align="center"><sub>主控板 PCB Layout（V1.0）— 原理图 5 页与嘉立创EDA 工程源文件见 <a href="hardware/">hardware/</a></sub></p>
+<p align="center"><sub>VibrationMonitor_F407 主控板（4 层板）— 原理图 5 页、PCB Layout 与嘉立创EDA 工程源文件见 <a href="hardware/">hardware/</a></sub></p>
 
 ---
 
@@ -101,7 +101,7 @@
 │   ├── schematic/     原理图 5 页（PNG，GitHub 上可直接预览）
 │   │                  ① STM32最小系统 ② 电源树 ③ 传感器
 │   │                  ④ 电机与输出    ⑤ 通信接口
-│   ├── pcb/           PCB Layout 总览
+│   ├── pcb/           PCB Layout 总览 + 3D 渲染图
 │   └── *.epru         嘉立创EDA 工程源文件（可编辑）
 │
 ├── esp32/             ESP32 无线通道 (Arduino)
@@ -138,12 +138,19 @@
 | 4 | 电机与输出 | TB6612FNG 双路 H 桥、LED 指示、蜂鸣器、电机开关 |
 | 5 | 通信接口 | USB Type-C、ESP32-WROOM-32、OLED、MAX13487 RS485 |
 
-**四个设计要点：**
+**五个设计要点：**
 
+- **4 层板叠层（信号 / GND / 电源 / 信号）**：第 2 层为完整 GND 平面，为第 1 层高速信号（SPI 5.25 MHz、8 MHz 晶振）提供就近回流路径，同时把信号层与第 3 层电源层隔开，避免电源噪声耦合进 mG 量级的 ADXL345 模拟电路。
 - **电源与电机隔离**：TB6612 的电机供电（VM）与逻辑供电（VCC）分开走线、各自独立去耦。电机是感性大电流负载，启停瞬间的反电动势极易串扰到 MCU。
 - **RS485 自动方向**：选用 MAX13487EESA 而非 MAX3485 + DE 控制线方案，省去一路 GPIO 和软件切换时序；代价是波特率受芯片内部超时限制，故固件锁定 115200（详见踩坑记录）。
 - **传感器端子化**：ADXL345 / DS18B20 经端子外接而非板上直焊——振动传感器需贴装于电机壳体，线长与位置直接影响信号质量，端子化便于现场调整。
 - **磁珠隔离电源**：ADXL345 供电串入 BLM18AG601SN1D 磁珠（600Ω@100MHz）。振动信号在 mG 量级，电源纹波会直接污染测量结果。
+
+<p align="center">
+  <img src="hardware/pcb/VibrationMonitor_F407_PCB_Layout.png" alt="VibrationMonitor_F407 PCB Layout" width="820">
+</p>
+
+<p align="center"><sub>PCB Layout — 4 层板 / 叠层 信号-GND-电源-信号</sub></p>
 
 ---
 
